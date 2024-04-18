@@ -46,13 +46,24 @@ def generate_launch_description():
 								   '-entity', 'my_bot'],
 						output='screen')
 
+	control_params = os.path.join(get_package_share_directory(package_name),'config','carlikebot_controllers.yaml')
+
+	control_node_remapped = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[control_params],
+        output="both",
+        remappings=[("/bicycle_steering_controller/tf_odometry", "/tf")])
+
 
 	# Launch the Diff_Controller
+ 
 	bicycle_steering_spawner = Node(
 		package='controller_manager', 
 		namespace = agent_ns,
 		executable='spawner', 
-		arguments=['bicycle_steering_controller'])
+		arguments=['bicycle_steering_controller'],
+		)
 		
 		# Launch the Joint_Broadcaster
 	joint_broad_spawner = Node(
@@ -86,6 +97,9 @@ def generate_launch_description():
         twist_mux_node,
 		gazebo,
 		spawn_entity,
+		control_node_remapped,
 		bicycle_steering_spawner,
 		joint_broad_spawner
 	])
+
+#
